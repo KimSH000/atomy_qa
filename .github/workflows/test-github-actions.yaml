@@ -1,7 +1,9 @@
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
+
 jobs:
+  # 1. 기존의 테스트 작업 (CI) - 질문자님의 로직 유지
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
@@ -16,3 +18,24 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  # 2. 새로 추가한 배포 작업 (CD)
+  Build-and-Push-Docker:
+    needs: Explore-GitHub-Actions  # CI가 성공해야만 실행됨!
+    runs-on: ubuntu-latest
+    steps:
+      # 중요: 각 Job은 완전히 별개의 컴퓨터(러너)이므로, 여기서도 다시 코드를 가져와야 합니다!
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Docker Hub 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Docker 이미지 빌드 및 푸시
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/atomy_qa:latest
