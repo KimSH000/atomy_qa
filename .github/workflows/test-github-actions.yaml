@@ -1,6 +1,8 @@
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+on: 
+	push:
+  		workflow_dispatch:  # 이제 언제든 수동으로 실행 가능!
 
 jobs:
   # 1. 기존의 테스트 작업 (CI) - 질문자님의 로직 유지
